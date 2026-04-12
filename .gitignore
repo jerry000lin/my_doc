@@ -14,3 +14,7 @@ Thumbs.db
 
 # 通用备份文件
 *~
+
+# Python 缓存文件
+__pycache__/
+*.pyc
