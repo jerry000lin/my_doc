@@ -10,7 +10,7 @@
 - 复用一段和外部系统同步的逻辑
 - 把组件里重复出现的状态组织方式抽离出去
 
-对应到这个案例文件 [React 自定义 hook 案例.jsx](./前端/react/React 自定义 hook 案例.tsx)，它讨论的不是“怎么少写代码”，而是一个更具体的问题：
+对应到这个案例文件 [react_custom_hook_case.tsx](./examples/react_custom_hook_case.tsx)，它讨论的不是“怎么少写代码”，而是一个更具体的问题：
 
 - 当筛选条件保存在 `localStorage` 里
 - 当 `storageKey` 会随着业务模块切换而变化

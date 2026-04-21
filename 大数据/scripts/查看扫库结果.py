@@ -32,7 +32,7 @@ else:
     PANDAS_IMPORT_ERROR = None
 
 
-SCAN_SCRIPT_NAME = "pyspark 扫库.py"
+SCAN_SCRIPT_NAME = "pyspark_扫库.py"
 OUTPUT_DIR_ENV_VAR = "SCAN_TABLE_OUTPUT_DIR"
 
 INVENTORY_CONFIG = {
