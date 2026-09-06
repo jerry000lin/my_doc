@@ -1,0 +1,20 @@
+[project]
+name = "langchain-text-splitter-playground"
+version = "0.1.0"
+description = "通过可视化案例学习 LangChain Text Splitter integrations"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "langchain-text-splitters==1.1.2",
+    "streamlit>=1.41,<2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3,<10",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
