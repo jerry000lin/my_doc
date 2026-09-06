@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         ChatGPT Auto Group Turn Collapser
 // @namespace    https://tampermonkey.net/
-// @version      1.4.1
-// @description  按组自动折叠较早 turn；超过 1.5 倍分组大小时触发；支持同时展开多组；仅监听 turn 级别新增/删除
+// @version      1.5.0
+// @description  按组自动折叠较早 turn；兼容带 data-turn-id-container 包装层的新对话结构
 // @match        https://chatgpt.com/*
 // @match        https://chat.openai.com/*
-// @run-at       document-idle
+// @run-at       document-idle  
 // @grant        none
 // ==/UserScript==
 
@@ -21,7 +21,8 @@
 
     const AUTO_COLLAPSE_MULTIPLIER = 1.5;
 
-    const TURN_SELECTOR = 'section[data-turn-id][data-testid^="conversation-turn-"]';
+    const TURN_SECTION_SELECTOR = 'section[data-turn-id][data-testid^="conversation-turn-"]';
+    const TURN_CONTAINER_ATTRIBUTE = 'data-turn-id-container';
     const HIDDEN_CLASS = 'cgpt-auto-group-hidden';
     const PLACEHOLDER_CLASS = 'cgpt-auto-group-placeholder';
     const STICKY_BAR_CLASS = 'cgpt-auto-group-sticky-bar';
@@ -119,16 +120,63 @@
     }
 
     function getTurnNodes() {
-        return Array.from(document.querySelectorAll(TURN_SELECTOR))
-            .filter(node => node instanceof HTMLElement);
+        const seen = new Set();
+        const turns = [];
+
+        for (const section of document.querySelectorAll(TURN_SECTION_SELECTOR)) {
+            if (!(section instanceof HTMLElement)) {
+                continue;
+            }
+
+            const turn = getTurnNode(section);
+            if (!seen.has(turn)) {
+                seen.add(turn);
+                turns.push(turn);
+            }
+        }
+
+        return turns;
+    }
+
+    function getTurnNode(section) {
+        const parent = section.parentElement;
+        const turnId = section.getAttribute('data-turn-id');
+
+        if (
+            parent instanceof HTMLElement &&
+            parent.getAttribute(TURN_CONTAINER_ATTRIBUTE) === turnId
+        ) {
+            return parent;
+        }
+
+        return section;
+    }
+
+    function getTurnSection(node) {
+        if (!(node instanceof HTMLElement)) {
+            return null;
+        }
+
+        if (node.matches(TURN_SECTION_SELECTOR)) {
+            return node;
+        }
+
+        const section = node.querySelector(TURN_SECTION_SELECTOR);
+        return section instanceof HTMLElement ? section : null;
     }
 
     function isTurnNode(node) {
-        return node instanceof HTMLElement && node.matches(TURN_SELECTOR);
+        if (!(node instanceof HTMLElement)) {
+            return false;
+        }
+
+        const section = getTurnSection(node);
+        return section !== null && getTurnNode(section) === node;
     }
 
     function getTurnId(turnEl) {
-        return turnEl.getAttribute('data-turn-id') || '';
+        const section = getTurnSection(turnEl);
+        return section ? section.getAttribute('data-turn-id') || '' : '';
     }
 
     function pickTurnsParent() {
